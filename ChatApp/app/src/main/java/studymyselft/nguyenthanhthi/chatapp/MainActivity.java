@@ -1,17 +1,21 @@
 package studymyselft.nguyenthanhthi.chatapp;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +28,32 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Chatting");
 
         handlingSignIn(); // xu ly viec sign in cua user
+        sendMessage(); // xu ly viec gui tin nhan cua user
+    }
+
+    /**
+     * xu ly viec gui gui tin nhan cua user
+     */
+    private void sendMessage() {
+        FloatingActionButton button = findViewById(R.id.floating_button);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText input = findViewById(R.id.text_input);
+
+                // Read the input field and push a new instance of ChatMessage to the Firebase database
+                FirebaseDatabase.getInstance()
+                        .getReference()
+                        .push()  // tu dong sinh key moi
+                        .setValue(new ChatMessage(
+                                FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
+                                input.getText().toString()
+                        ));
+                // clear the input
+                input.setText("");
+            }
+        });
     }
 
     /**
