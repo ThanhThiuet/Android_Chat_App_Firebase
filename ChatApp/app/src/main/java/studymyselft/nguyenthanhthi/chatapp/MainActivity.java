@@ -9,17 +9,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+
+import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int SIGN_IN_REQUEST_CODE;
+    private int SIGN_IN_REQUEST_CODE = 1;
+    private FirebaseListAdapter<ChatMessage> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 displayChatMessages();
             } else {
                 Toast.makeText(this, "Sign in fail! Please try again later", Toast.LENGTH_SHORT).show();
-                // close the app
-                finish();
+                finish(); // close the app
             }
         }
     }
@@ -97,8 +105,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this,
                                     "You have been signed out.",
                                     Toast.LENGTH_SHORT).show();
-                            // close activity
-                            finish();
+                            finish(); // close activity
                         }
                     });
         }
@@ -127,7 +134,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * xu ly viec gui tin nhan chat
+     */
     private void displayChatMessages() {
+        ListView listMessages = findViewById(R.id.list_messages);
 
+        Query query = FirebaseDatabase.getInstance().getReference().child("");
+
+        FirebaseListOptions<ChatMessage> options = new FirebaseListOptions.Builder<ChatMessage>()
+                .setQuery(query, ChatMessage.class)
+                .setLayout(R.layout.message)
+                .build();
+
+        adapter = new FirebaseListAdapter<ChatMessage>(options) {
+            @Override
+            protected void populateView(View v, ChatMessage model, int position) {
+                TextView messageUser = findViewById(R.id.message_user);
+                TextView messageText = findViewById(R.id.message_text);
+                TextView messageTime = findViewById(R.id.message_time);
+
+                messageUser.setText(model.getMessageUser());
+                messageText.setText(model.getMessageText());
+
+                // format date before showing
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyy (HH:mm:ss)");
+                messageTime.setText(dateFormat.format(model.getMessageTime()));
+            }
+        };
+
+        listMessages.setAdapter(adapter);
     }
 }
