@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * xu ly viec gui tin nhan chat
+     * xu ly viec hien thi tin nhan chat
      */
     private void displayChatMessages() {
         ListView listMessages = findViewById(R.id.list_messages);
 
-        Query query = FirebaseDatabase.getInstance().getReference().child("");
+        Query query = FirebaseDatabase.getInstance().getReference();
 
         FirebaseListOptions<ChatMessage> options = new FirebaseListOptions.Builder<ChatMessage>()
                 .setQuery(query, ChatMessage.class)
